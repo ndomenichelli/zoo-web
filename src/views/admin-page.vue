@@ -21,34 +21,25 @@
         <label>Birthdate:</label>
         <input v-model="birthdate" class="form-control" />
       </div>
-      <!-- <div class="form-group">
-        <label>imageLink:</label>
-        <input v-model="imageLink" class="form-control" />
-      </div> -->
       <!-- <div class="image-uploader">
-        <div>
-          <div>
-            <div>
-              <button @click="click1">choose a photo</button>
-              <input
-                type="file"
-                ref="input1"
-                style="display: none"
-                @change="previewImage"
-                accept="image/*"
-              />
-            </div>
-
-            <div v-if="imageData != null">
-              <img class="preview" height="268" width="356" :src="img1" />
-              <br />
-            </div>
-          </div>
-        </div>
+        <button @click="click1">choose a photo</button>
+        <input
+          type="file"
+          ref="input1"
+          style="display: none"
+          @change="previewImage"
+          accept="image/*"
+        />
       </div> -->
-      <div>
-        <DropZone />
-        <span class="file-info">File {{ dropzoneFile.name }}</span>
+      <div class="home">
+        <DropZone @drop.prevent="drop" @change="selectedFile" />
+      </div>
+      <div v-if="imageData != null">
+        <span class="file-info">File: {{ img1 }}</span>
+        <div>
+          <img class="preview" height="268" width="356" :src="img1" />
+          <br />
+        </div>
       </div>
     </form>
     <div>
@@ -66,17 +57,21 @@ import {
   getDownloadURL
 } from 'firebase/storage'
 import DropZone from '@/components/drop-zone.vue'
-import { ref as vueRef } from 'vue'
+// import { ref as vueRef } from 'vue'
 
 export default {
   name: 'admin-page',
   components: {
     DropZone
   },
-  setup () {
-    const dropzoneFile = vueRef('')
-    return { dropzoneFile }
+  props: {
+    imageDataDrop: Object
   },
+  // setup (imageDataDrop) {
+  //   const dropzoneFile = vueRef('')
+
+  //   return { dropzoneFile }
+  // },
   data () {
     return {
       events: null,
@@ -94,8 +89,10 @@ export default {
   },
   methods: {
     onSubmitForm () {
-      if (this.name === '') {
+      if (this.name === '' || this.img1 === '') {
         alert('enter name')
+
+        alert(this.dropzoneFile.value)
         return
       }
       const db = getDatabase()
@@ -109,7 +106,6 @@ export default {
         type: this.type,
         description: this.description,
         birthdate: this.birthdate,
-        imageLink: this.imageLink,
         image: this.img1
       })
     },
@@ -122,23 +118,27 @@ export default {
       console.log('previewImage')
       this.uploadValue = 0
       this.img1 = null
-      this.imageData = event.target.files[0]
+      // this.imageData = event.target.files[0]
       this.onUpload()
+    },
+    // drop picture into dropbox
+    drop (event) {
+      this.imageData = event.dataTransfer.files[0]
+      console.log(this.imageData)
+      this.previewImage()
+    },
+    // manually select picture
+    selectedFile () {
+      this.imageData = document.querySelector('.dropzoneFile').files[0]
+      console.log(this.imageData)
+      this.previewImage()
     },
 
     onUpload () {
-      // console.log("onUpload");
-
       this.img1 = null
       const storage = getStorage()
-
-      // console.log("onUpload getstorage");
-
       const storageRef = storRef(storage, `animals/${this.imageData}`)
-
       const uploadTask = uploadBytesResumable(storageRef, this.imageData)
-
-      // console.log("onUpload 2");
 
       // Register three observers:
       // 1. 'state_changed' observer, called any time the state changes
@@ -178,18 +178,22 @@ export default {
         }
       )
     }
-  },
-  created () {
-    // EventService.getEvents()
-    //   .then((response) => {
-    //     console.log("events: ", response.data);
-    //     this.events = response.data;
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
   }
 }
 </script>
 <style scoped lang="scss">
+.home {
+  height: auto;
+  width: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+
+  .file-info {
+    margin-top: 32px;
+  }
+}
 </style>
