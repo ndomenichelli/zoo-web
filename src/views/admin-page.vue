@@ -118,7 +118,6 @@ export default {
       console.log('previewImage')
       this.uploadValue = 0
       this.img1 = null
-      // this.imageData = event.target.files[0]
       this.onUpload()
     },
     // drop picture into dropbox
