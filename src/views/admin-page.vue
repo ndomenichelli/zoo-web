@@ -64,9 +64,9 @@ export default {
   components: {
     DropZone
   },
-  props: {
-    imageDataDrop: Object
-  },
+  // props: {
+  //   imageDataDrop: Object
+  // },
   // setup (imageDataDrop) {
   //   const dropzoneFile = vueRef('')
 
@@ -136,7 +136,7 @@ export default {
     onUpload () {
       this.img1 = null
       const storage = getStorage()
-      const storageRef = storRef(storage, `animals/${this.imageData}`)
+      const storageRef = storRef(storage, `animals/${this.imageData.name}`)
       const uploadTask = uploadBytesResumable(storageRef, this.imageData)
 
       // Register three observers:
