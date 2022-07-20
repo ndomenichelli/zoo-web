@@ -4,7 +4,7 @@
     :to="{ name: 'AnimalDetails', params: { id: animal.id } }"
   >
     <div class="animal-card">
-      <h4>{{ animal.name }}</h4>
+      <!-- <h4>{{ animal.name }}</h4> -->
       <img v-if="animal.image != ''" class="image" :src="animal.image" />
       <!-- <div>{{ animal.image }}</div> -->
       <!-- <div>Type of animal: {{ animal.type }}</div> -->
@@ -47,8 +47,4 @@ export default {
   height: 100%;
 }
 
-.animal-link {
-  color: #2c3e50;
-  text-decoration: none;
-}
 </style>
