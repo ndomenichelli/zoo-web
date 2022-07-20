@@ -5,9 +5,22 @@
         &lt; Back to Animal Gallery</router-link
       >
       <div class="nav-bar">
-        <button class="nav-button">&lt; Back</button>
+        <button
+          v-show="currentIndex != 0"
+          class="nav-button"
+          @click="getPreviousAnimal"
+        >
+          &lt; Back
+        </button>
         <h1>{{ animal.name }}</h1>
-        <button class="nav-button">Forward ></button>
+        <h1>{{ currentIndex }}</h1>
+        <button
+          v-show="this.currentIndex !== this.animals.length - 1"
+          class="nav-button"
+          @click="getNextAnimal"
+        >
+          Forward >
+        </button>
       </div>
       <img v-if="animal.image != ''" class="image" :src="animal.image" />
       <p>Type of animal: {{ animal.type }}</p>
@@ -26,10 +39,15 @@ export default {
   props: ['id'],
   data () {
     return {
-      animal: null
+      animal: null,
+      animals: [],
+      keys: [],
+      currentKey: '',
+      currentIndex: -1
     }
   },
   created () {
+    // get current animal
     const db = getDatabase()
     const animalsRef = ref(db, 'animals/' + this.id)
 
@@ -37,12 +55,55 @@ export default {
       console.log(snapshot.val())
 
       this.animal = snapshot.val()
+      this.currentKey = animalsRef.key
+    })
+
+    // get all animals to cycle through
+    const allAnimalsRef = ref(db, 'animals/')
+
+    onValue(allAnimalsRef, (snapshot) => {
+      const data = snapshot.val()
+
+      // get array of just keys
+      Object.entries(data).forEach(([animalKey, animalElement]) => {
+        this.keys.push(animalKey)
+        this.animals.push(animalElement)
+      })
+
+      this.currentIndex = this.keys.findIndex(this.getKey)
     })
   },
   methods: {
     formatDate (dateString) {
       const date = new Date(dateString)
       return date.toDateString()
+    },
+    getKey (key) {
+      return key === this.currentKey
+    },
+    getPreviousAnimal () {
+      if (this.currentIndex !== 0) {
+        this.animal = this.animals[this.currentIndex - 1]
+
+        this.$router.push({
+          name: 'AnimalDetails',
+          params: { id: this.keys[this.currentIndex - 1] }
+        })
+        this.currentIndex--
+      } else {
+        alert('cant go back')
+      }
+    },
+    getNextAnimal () {
+      if (this.currentIndex !== this.animals.length - 1) {
+        this.animal = this.animals[this.currentIndex + 1]
+
+        this.$router.push({
+          name: 'AnimalDetails',
+          params: { id: this.keys[this.currentIndex + 1] }
+        })
+        this.currentIndex++
+      }
     }
   }
 }
