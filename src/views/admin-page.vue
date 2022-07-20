@@ -76,7 +76,7 @@ export default {
     return {
       events: null,
       animals: [],
-      id: 'a0',
+      id: '',
       name: '',
       type: '',
       description: '',
@@ -101,13 +101,16 @@ export default {
       const newAnimalsRef = push(animalsRef)
 
       set(newAnimalsRef, {
-        id: this.id,
+        id: newAnimalsRef.key,
         name: this.name,
         type: this.type,
         description: this.description,
         birthdate: this.birthdate,
         image: this.img1
       })
+
+      console.log('data ' + newAnimalsRef.key)
+      this.id = newAnimalsRef.key
     },
 
     click1 () {

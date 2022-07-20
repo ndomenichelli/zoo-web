@@ -1,30 +1,47 @@
 <template>
-  <div v-if="event">
-    <h1>{{ event.title }}</h1>
-    <p>{{ event.time }} on {{ event.date }} @ {{ event.location }}</p>
-    <p>{{ event.description }}</p>
+  <div v-if="animal">
+    <h1>{{ animal.name }}</h1>
+    <img v-if="animal.image != ''" class="image" :src="animal.image" />
+    <p>Type of animal: {{ animal.type }}</p>
+    <p>This animals was born on {{ animal.birthdate }}</p>
+    <p>{{ animal.description }}</p>
   </div>
 </template>
 
 <script>
-import EventService from '@/services/EventService.js'
+// import EventService from '@/services/EventService.js'
+import { getDatabase, ref, onValue } from '@firebase/database'
 
 export default {
   props: ['id'],
   data () {
     return {
-      event: null
+      animal: null
     }
   },
   created () {
-    // fetch event (by id) and set local event data
-    EventService.getEvent(this.id)
-      .then((response) => {
-        this.event = response.data
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    const db = getDatabase()
+    const animalsRef = ref(db, 'animals/' + this.id)
+
+    onValue(animalsRef, (snapshot) => {
+      console.log(snapshot.val())
+
+      this.animal = snapshot.val()
+
+      // Object.entries(data).forEach(([animalKey, animalElement]) => {
+      //   console.log(animalKey)
+      //   this.animals.push(animalElement)
+      // })
+
+      // console.log(this.animal)
+    })
   }
 }
 </script>
+<style lang="scss">
+.image {
+  border: 1px solid black;
+  width: 100%;
+  height: 100%;
+}
+</style>

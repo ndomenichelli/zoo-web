@@ -1,21 +1,16 @@
 <template>
   <router-link
-    class="event-link"
+    class="animal-link"
     :to="{ name: 'AnimalDetails', params: { id: animal.id } }"
   >
-    <div class="event-card">
+    <div class="animal-card">
       <h4>{{ animal.name }}</h4>
-      <!-- <img
-        v-if="animal.imageLink != null"
-        class="image"
-        :src="thumbUrl(animal.imageLink)"
-      /> -->
       <img v-if="animal.image != ''" class="image" :src="animal.image" />
-      <div>{{ animal.image }}</div>
-      <div>Type of animal: {{ animal.type }}</div>
-      <div>{{ animal.description }}</div>
-      <div>{{ animal.birthdate }}</div>
-      <div>{{ animal.imageLink }}</div>
+      <!-- <div>{{ animal.image }}</div> -->
+      <!-- <div>Type of animal: {{ animal.type }}</div> -->
+      <!-- <div>{{ animal.description }}</div> -->
+      <!-- <div>{{ animal.birthdate }}</div> -->
+      <!-- <div>{{ animal.imageLink }}</div> -->
     </div>
   </router-link>
 </template>
@@ -38,7 +33,7 @@ export default {
 </script>
 
 <style scoped>
-.event-card {
+.animal-card {
   padding: 20px;
   width: 250px;
   cursor: pointer;
@@ -52,7 +47,7 @@ export default {
   height: 100%;
 }
 
-.event-link {
+.animal-link {
   color: #2c3e50;
   text-decoration: none;
 }
