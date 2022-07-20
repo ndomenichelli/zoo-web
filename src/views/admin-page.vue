@@ -3,25 +3,25 @@
     <div class="admin">
       <h1>This is an admin page to add Animals</h1>
     </div>
-    <div id="chat" class="container"></div>
-    <form @submit.prevent="onSubmit">
-      <div class="form-group">
-        <label>Name:</label>
-        <input v-model="name" class="form-control" />
-      </div>
-      <div class="form-group">
-        <label>Type:</label>
-        <input v-model="type" class="form-control" />
-      </div>
-      <div class="form-group">
-        <label>Description:</label>
-        <textarea v-model="description" class="form-control"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Birthdate:</label>
-        <input v-model="birthdate" class="form-control" />
-      </div>
-      <!-- <div class="image-uploader">
+    <div class="form-container">
+      <form @submit.prevent="onSubmit">
+        <div class="form-group">
+          <label>Name:</label>
+          <input v-model="name" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Type:</label>
+          <input v-model="type" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Description:</label>
+          <textarea v-model="description" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Birthdate:</label>
+          <input v-model="birthdate" class="form-control" />
+        </div>
+        <!-- <div class="image-uploader">
         <button @click="click1">choose a photo</button>
         <input
           type="file"
@@ -31,17 +31,18 @@
           accept="image/*"
         />
       </div> -->
-      <div class="home">
-        <DropZone @drop.prevent="drop" @change="selectedFile" />
-      </div>
-      <div v-if="imageData != null">
-        <span class="file-info">File: {{ img1 }}</span>
-        <div>
-          <img class="preview" height="268" width="356" :src="img1" />
-          <br />
+        <div class="dropzone-container">
+          <DropZone @drop.prevent="drop" @change="selectedFile" />
         </div>
-      </div>
-    </form>
+        <div v-if="imageData != null">
+          <span class="file-info">File: {{ img1 }}</span>
+          <div>
+            <img class="preview" height="268" width="356" :src="img1" />
+            <br />
+          </div>
+        </div>
+      </form>
+    </div>
     <div>
       <button @click="onSubmitForm">Upload Data</button>
     </div>
@@ -64,14 +65,6 @@ export default {
   components: {
     DropZone
   },
-  // props: {
-  //   imageDataDrop: Object
-  // },
-  // setup (imageDataDrop) {
-  //   const dropzoneFile = vueRef('')
-
-  //   return { dropzoneFile }
-  // },
   data () {
     return {
       events: null,
@@ -185,18 +178,31 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-.home {
-  height: auto;
-  width: auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: white;
+.form-container {
+  .form-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    column-gap: 16px;
+    label {
+      align-items: left;
+    }
+  }
+  .dropzone-container {
+    height: auto;
+    width: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
 
-  .file-info {
-    margin-top: 32px;
+    .file-info {
+      margin-top: 32px;
+    }
   }
 }
 </style>

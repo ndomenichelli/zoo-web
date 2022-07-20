@@ -6,8 +6,8 @@
       >
       <div class="nav-bar">
         <button
-          v-show="currentIndex != 0"
-          class="nav-button"
+          :class="{ invisible: !currentIndex != 0 }"
+          class="nav-button back"
           @click="getPreviousAnimal"
         >
           &lt; Back
@@ -15,8 +15,8 @@
         <h1>{{ animal.name }}</h1>
         <h1>{{ currentIndex }}</h1>
         <button
-          v-show="this.currentIndex !== this.animals.length - 1"
-          class="nav-button"
+          :class="{ invisible: (this.currentIndex == (this.animals.length - 1)) }"
+          class="nav-button forward"
           @click="getNextAnimal"
         >
           Forward >
@@ -141,6 +141,9 @@ export default {
       font-size: 16px;
       margin: 40px 20px;
       cursor: pointer;
+    }
+    .invisible {
+      visibility: hidden;
     }
   }
   .image {
