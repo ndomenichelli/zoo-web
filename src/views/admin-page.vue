@@ -106,7 +106,8 @@ export default {
         type: this.type,
         description: this.description,
         birthdate: this.birthdate,
-        image: this.img1
+        image: this.img1,
+        dateAdded: Date.now()
       })
 
       console.log('data ' + newAnimalsRef.key)

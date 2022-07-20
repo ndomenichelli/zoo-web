@@ -1,7 +1,9 @@
 <template>
   <div class="animal-page">
     <div v-if="animal">
-      <router-link class="back-button" :to="{name: 'Animals'}"> &lt; Back to Animal Gallery</router-link>
+      <router-link class="back-button" :to="{name: 'Animals'}">
+        &lt; Back to Animal Gallery</router-link
+      >
       <div class="nav-bar">
         <button class="nav-button">&lt; Back</button>
         <h1>{{ animal.name }}</h1>
@@ -11,6 +13,7 @@
       <p>Type of animal: {{ animal.type }}</p>
       <p>This animals was born on: {{ animal.birthdate }}</p>
       <p>{{ animal.description }}</p>
+      <p>Date Added: {{ formatDate(animal.dateAdded) }}</p>
     </div>
   </div>
 </template>
@@ -35,6 +38,12 @@ export default {
 
       this.animal = snapshot.val()
     })
+  },
+  methods: {
+    formatDate (dateString) {
+      const date = new Date(dateString)
+      return date.toDateString()
+    }
   }
 }
 </script>
