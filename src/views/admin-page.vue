@@ -177,7 +177,7 @@ export default {
           this.uploadValue = 100
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             // console.log('File available at', downloadURL)
-            if (downloadURL.includes('.jpg')) {
+            if (downloadURL.includes('.jpg') || downloadURL.includes('.png')) {
               this.img1 = downloadURL
               console.log('img1: ' + this.img1)
             } else if (downloadURL.includes('.mp4')) {
