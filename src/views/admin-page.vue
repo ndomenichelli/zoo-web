@@ -31,21 +31,37 @@
           accept="image/*"
         />
       </div> -->
+        <div v-if="progress != 0">{{ progress.toFixed() }} %</div>
         <div class="dropzone-container">
+          <div>Pictures</div>
           <DropZone @drop.prevent="drop" @change="selectedFile" />
+          <div>{{ uploadData.toString() }}</div>
         </div>
-        <div v-if="img1 != null">
-          <span class="file-info">File: {{ img1 }}</span>
-          <div>
-            <img class="preview" height="268" width="356" :src="img1" />
-            <br />
+        <div v-for="data in uploadData" :key="data.id">
+          <div>data: {{ data.name }}</div>
+          <div v-for="d in data" :key="d.id">
+            <div>{{ d.toString() }}</div>
           </div>
+
+          <!-- <div v-if="data.image != null">
+            <span class="file-info">File: {{ data.image }}</span>
+            <div>
+              <img class="preview" height="268" width="356" :src="img1" />
+              <br />
+            </div>
+          </div> -->
+          <!-- <video
+            v-if="data.videoLink != null"
+            width="320"
+            height="240"
+            controls
+            muted
+          >
+            <source :src="data.videoLink" type="video/mp4" />
+            <source :src="data.videoLink" type="video/ogg" />
+            Your browser does not support the video tag.
+          </video> -->
         </div>
-        <video v-if="videoLink != null" width="320" height="240" controls muted>
-          <source :src="videoLink" type="video/mp4" />
-          <source :src="videoLink" type="video/ogg" />
-          Your browser does not support the video tag.
-        </video>
       </form>
     </div>
     <div>
@@ -81,9 +97,11 @@ export default {
       birthdate: '',
       imageLink: '',
       image: '',
+      uploadData: [],
       img1: null,
       imageData: null,
-      videoLink: null
+      videoLink: null,
+      progress: 0
     }
   },
   methods: {
@@ -129,13 +147,14 @@ export default {
     // drop picture into dropbox
     drop (event) {
       this.imageData = event.dataTransfer.files[0]
-      // console.log(this.imageData)
+      this.uploadData.push(event.dataTransfer.files[0])
       this.previewImage()
     },
     // manually select picture
     selectedFile () {
       this.imageData = document.querySelector('.dropzoneFile').files[0]
-      console.log(this.imageData)
+      this.uploadData.push(document.querySelector('.dropzoneFile').files[0])
+      console.log('uploadData' + this.uploadData)
       this.previewImage()
     },
 
@@ -155,9 +174,9 @@ export default {
         (snapshot) => {
           // Observe state change events such as progress, pause, and resume
           // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-          // const progress =
-          //   (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          // console.log('Upload is ' + progress + '% done')
+          this.progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          console.log('Upload is ' + this.progress + '% done')
           switch (snapshot.state) {
             case 'paused':
               console.log('Upload is paused')
@@ -205,11 +224,11 @@ export default {
       text-align: right;
     }
     label + input {
-      width: 15%;
+      width: 30%;
       margin: 0 30% 0 2%;
     }
     label + textarea {
-      width: 15%;
+      width: 30%;
       margin: 0 30% 0 2%;
       resize: vertical;
     }
