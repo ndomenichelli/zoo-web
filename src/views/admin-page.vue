@@ -35,10 +35,9 @@
         <div class="dropzone-container">
           <div>Pictures to Upload:</div>
           <DropZone @drop.prevent="drop" @change="selectedFile" />
-          <div>{{ uploadPictureData }}</div>
         </div>
         <div v-for="picture in uploadPictureData" :key="picture.id">
-          <div>data: {{ picture.name }}</div>
+          <div>{{ picture.name }}</div>
           <!-- <div v-if="data.image != null">
             <span class="file-info">File: {{ data.image }}</span>
             <div>
@@ -57,6 +56,9 @@
             <source :src="data.videoLink" type="video/ogg" />
             Your browser does not support the video tag.
           </video> -->
+        </div>
+        <div v-for="video in uploadVideoData" :key="video.id">
+          <div>{{ video.name }}</div>
         </div>
       </form>
     </div>
@@ -96,7 +98,7 @@ export default {
       uploadPictureData: [],
       uploadVideoData: [],
       img1: null,
-      imageData: null,
+      dropData: null,
       videoLink: null,
       progress: 0
     }
@@ -143,78 +145,91 @@ export default {
     },
     // drop picture into dropbox
     drop (event) {
-      // this.imageData = event.dataTransfer.files[0]
-      this.uploadPictureData.push(event.dataTransfer.files[0])
-      this.previewImage()
-    },
-    // manually select picture
-    selectedFile () {
-      // this.imageData = document.querySelector('.dropzoneFile').files[0]
-      this.uploadPictureData.push(
-        document.querySelector('.dropzoneFile').files[0]
-      )
-      console.log('uploadData' + this.uploadData)
-      this.previewImage()
-    },
+      this.dropData = event.dataTransfer.files[0]
 
+      const filename = this.dropData.name
+
+      if (filename.includes('.jpg') || filename.includes('.png')) {
+        this.uploadPictureData.push(event.dataTransfer.files[0])
+      } else if (filename.includes('.mp4')) {
+        this.uploadVideoData.push(event.dataTransfer.files[0])
+      }
+      this.previewImage()
+    },
+    // manually select file
+    selectedFile () {
+      this.dropData = document.querySelector('.dropzoneFile').files[0]
+
+      const filename = this.dropData.name
+
+      if (filename.includes('.jpg') || filename.includes('.png')) {
+        this.uploadPictureData.push(
+          document.querySelector('.dropzoneFile').files[0]
+        )
+      } else if (filename.includes('.mp4')) {
+        this.uploadVideoData.push(
+          document.querySelector('.dropzoneFile').files[0]
+        )
+      }
+      this.previewImage()
+    },
     onUpload () {
       this.img1 = null
 
-      this.uploadPictureData.forEach((uploadPicture) => {
-        console.log('uploadPicture: ' + uploadPicture.name)
+      this.uploadPictureData.forEach(this.upload)
+      this.uploadVideoData.forEach(this.upload)
+    },
+    upload (uploadMedia) {
+      console.log('uploadPicture: ' + uploadMedia.name)
 
-        const storage = getStorage()
-        const storageRef = storRef(
-          storage,
-          `animals/${this.name}/${uploadPicture.name}`
-        )
-        const uploadTask = uploadBytesResumable(storageRef, uploadPicture)
-        // Register three observers:
-        // 1. 'state_changed' observer, called any time the state changes
-        // 2. Error observer, called on failure
-        // 3. Completion observer, called on successful completion
-        // console.log('upload task check')
-        uploadTask.on(
-          'state_changed',
-          (snapshot) => {
-            // Observe state change events such as progress, pause, and resume
-            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-            this.progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-            console.log('Upload is ' + this.progress + '% done')
-            switch (snapshot.state) {
-              case 'paused':
-                console.log('Upload is paused')
-                break
-              case 'running':
-                console.log('Upload is running')
-                break
-            }
-          },
-          (error) => {
-            // Handle unsuccessful uploads
-            console.log('Unsuccessful Upload: ' + error)
-          },
-          () => {
-            // Handle successful uploads on complete
-            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-            this.uploadValue = 100
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              // console.log('File available at', downloadURL)
-              if (
-                downloadURL.includes('.jpg') ||
-                downloadURL.includes('.png')
-              ) {
-                this.img1 = downloadURL
-                console.log('img1: ' + this.img1)
-              } else if (downloadURL.includes('.mp4')) {
-                this.videoLink = downloadURL
-                console.log('videoLink: ' + this.videoLink)
-              }
-            })
+      const storage = getStorage()
+      const storageRef = storRef(
+        storage,
+        `animals/${this.name}/${uploadMedia.name}`
+      )
+      const uploadTask = uploadBytesResumable(storageRef, uploadMedia)
+      // Register three observers:
+      // 1. 'state_changed' observer, called any time the state changes
+      // 2. Error observer, called on failure
+      // 3. Completion observer, called on successful completion
+      // console.log('upload task check')
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          // Observe state change events such as progress, pause, and resume
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          this.progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          console.log('Upload is ' + this.progress + '% done')
+          switch (snapshot.state) {
+            case 'paused':
+              console.log('Upload is paused')
+              break
+            case 'running':
+              console.log('Upload is running')
+              break
           }
-        )
-      })
+        },
+        (error) => {
+          // Handle unsuccessful uploads
+          console.log('Unsuccessful Upload: ' + error)
+        },
+        () => {
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          this.uploadValue = 100
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            // console.log('File available at', downloadURL)
+            if (downloadURL.includes('.jpg') || downloadURL.includes('.png')) {
+              this.img1 = downloadURL
+              console.log('img1: ' + this.img1)
+            } else if (downloadURL.includes('.mp4')) {
+              this.videoLink = downloadURL
+              console.log('videoLink: ' + this.videoLink)
+            }
+          })
+        }
+      )
     }
   }
 }
