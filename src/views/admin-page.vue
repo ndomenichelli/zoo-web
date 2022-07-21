@@ -33,16 +33,12 @@
       </div> -->
         <div v-if="progress != 0">{{ progress.toFixed() }} %</div>
         <div class="dropzone-container">
-          <div>Pictures</div>
+          <div>Pictures to Upload:</div>
           <DropZone @drop.prevent="drop" @change="selectedFile" />
-          <div>{{ uploadData.toString() }}</div>
+          <div>{{ uploadPictureData }}</div>
         </div>
-        <div v-for="data in uploadData" :key="data.id">
-          <div>data: {{ data.name }}</div>
-          <div v-for="d in data" :key="d.id">
-            <div>{{ d.toString() }}</div>
-          </div>
-
+        <div v-for="picture in uploadPictureData" :key="picture.id">
+          <div>data: {{ picture.name }}</div>
           <!-- <div v-if="data.image != null">
             <span class="file-info">File: {{ data.image }}</span>
             <div>
@@ -97,7 +93,8 @@ export default {
       birthdate: '',
       imageLink: '',
       image: '',
-      uploadData: [],
+      uploadPictureData: [],
+      uploadVideoData: [],
       img1: null,
       imageData: null,
       videoLink: null,
@@ -146,66 +143,78 @@ export default {
     },
     // drop picture into dropbox
     drop (event) {
-      this.imageData = event.dataTransfer.files[0]
-      this.uploadData.push(event.dataTransfer.files[0])
+      // this.imageData = event.dataTransfer.files[0]
+      this.uploadPictureData.push(event.dataTransfer.files[0])
       this.previewImage()
     },
     // manually select picture
     selectedFile () {
-      this.imageData = document.querySelector('.dropzoneFile').files[0]
-      this.uploadData.push(document.querySelector('.dropzoneFile').files[0])
+      // this.imageData = document.querySelector('.dropzoneFile').files[0]
+      this.uploadPictureData.push(
+        document.querySelector('.dropzoneFile').files[0]
+      )
       console.log('uploadData' + this.uploadData)
       this.previewImage()
     },
 
     onUpload () {
       this.img1 = null
-      const storage = getStorage()
-      const storageRef = storRef(storage, `animals/${this.imageData.name}`)
-      const uploadTask = uploadBytesResumable(storageRef, this.imageData)
 
-      // Register three observers:
-      // 1. 'state_changed' observer, called any time the state changes
-      // 2. Error observer, called on failure
-      // 3. Completion observer, called on successful completion
-      // console.log('upload task check')
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          // Observe state change events such as progress, pause, and resume
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-          this.progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          console.log('Upload is ' + this.progress + '% done')
-          switch (snapshot.state) {
-            case 'paused':
-              console.log('Upload is paused')
-              break
-            case 'running':
-              console.log('Upload is running')
-              break
-          }
-        },
-        (error) => {
-          // Handle unsuccessful uploads
-          console.log('Unsuccessful Upload: ' + error)
-        },
-        () => {
-          // Handle successful uploads on complete
-          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-          this.uploadValue = 100
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            // console.log('File available at', downloadURL)
-            if (downloadURL.includes('.jpg') || downloadURL.includes('.png')) {
-              this.img1 = downloadURL
-              console.log('img1: ' + this.img1)
-            } else if (downloadURL.includes('.mp4')) {
-              this.videoLink = downloadURL
-              console.log('videoLink: ' + this.videoLink)
+      this.uploadPictureData.forEach((uploadPicture) => {
+        console.log('uploadPicture: ' + uploadPicture.name)
+
+        const storage = getStorage()
+        const storageRef = storRef(
+          storage,
+          `animals/${this.name}/${uploadPicture.name}`
+        )
+        const uploadTask = uploadBytesResumable(storageRef, uploadPicture)
+        // Register three observers:
+        // 1. 'state_changed' observer, called any time the state changes
+        // 2. Error observer, called on failure
+        // 3. Completion observer, called on successful completion
+        // console.log('upload task check')
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            // Observe state change events such as progress, pause, and resume
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            this.progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            console.log('Upload is ' + this.progress + '% done')
+            switch (snapshot.state) {
+              case 'paused':
+                console.log('Upload is paused')
+                break
+              case 'running':
+                console.log('Upload is running')
+                break
             }
-          })
-        }
-      )
+          },
+          (error) => {
+            // Handle unsuccessful uploads
+            console.log('Unsuccessful Upload: ' + error)
+          },
+          () => {
+            // Handle successful uploads on complete
+            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+            this.uploadValue = 100
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              // console.log('File available at', downloadURL)
+              if (
+                downloadURL.includes('.jpg') ||
+                downloadURL.includes('.png')
+              ) {
+                this.img1 = downloadURL
+                console.log('img1: ' + this.img1)
+              } else if (downloadURL.includes('.mp4')) {
+                this.videoLink = downloadURL
+                console.log('videoLink: ' + this.videoLink)
+              }
+            })
+          }
+        )
+      })
     }
   }
 }
