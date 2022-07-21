@@ -22,10 +22,18 @@
           Forward >
         </button>
       </div>
-      <img v-if="animal.image != ''" class="image" :src="animal.image" />
-      <video width="320" height="240" controls muted>
+      <p>{{ animal.videoLink }}</p>
+      <img v-if="animal.image != null" class="image" :src="animal.image" />
+      <video
+        v-if="animal.videoLink != null"
+        id = "video"
+        width="400"
+        height="400"
+        controls
+        muted
+      >
         <source :src="animal.videoLink" type="video/mp4" />
-        <source :src="animal.image" type="video/ogg" />
+        <source :src="animal.videoLink" type="video/ogg" />
         Your browser does not support the video tag.
       </video>
       <p>Type of animal: {{ animal.type }}</p>
@@ -91,6 +99,8 @@ export default {
       if (this.currentIndex !== 0) {
         this.animal = this.animals[this.currentIndex - 1]
 
+        this.changeVideo(this.animal.videoLink)
+
         this.$router.push({
           name: 'AnimalDetails',
           params: { id: this.keys[this.currentIndex - 1] }
@@ -104,12 +114,22 @@ export default {
       if (this.currentIndex !== this.animals.length - 1) {
         this.animal = this.animals[this.currentIndex + 1]
 
+        this.changeVideo(this.animal.videoLink)
+
         this.$router.push({
           name: 'AnimalDetails',
           params: { id: this.keys[this.currentIndex + 1] }
         })
         this.currentIndex++
       }
+    },
+    changeVideo (vid) {
+      // switch video
+      const video = document.getElementById('video')
+      const source = document.createElement('source')
+      video.pause()
+      source.setAttribute('src', vid)
+      video.load()
     }
   }
 }

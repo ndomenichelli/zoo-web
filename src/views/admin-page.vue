@@ -34,13 +34,18 @@
         <div class="dropzone-container">
           <DropZone @drop.prevent="drop" @change="selectedFile" />
         </div>
-        <div v-if="imageData != null">
+        <div v-if="img1 != null">
           <span class="file-info">File: {{ img1 }}</span>
           <div>
             <img class="preview" height="268" width="356" :src="img1" />
             <br />
           </div>
         </div>
+        <video v-if="videoLink != null" width="320" height="240" controls muted>
+          <source :src="videoLink" type="video/mp4" />
+          <source :src="videoLink" type="video/ogg" />
+          Your browser does not support the video tag.
+        </video>
       </form>
     </div>
     <div>
@@ -76,9 +81,9 @@ export default {
       birthdate: '',
       imageLink: '',
       image: '',
-      img1: '',
+      img1: null,
       imageData: null,
-      videoLink: ''
+      videoLink: null
     }
   },
   methods: {
@@ -172,9 +177,13 @@ export default {
           this.uploadValue = 100
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             // console.log('File available at', downloadURL)
-            this.img1 = downloadURL
-            this.videoLink = downloadURL
-            console.log('videoLink: ' + this.videoLink)
+            if (downloadURL.includes('.jpg')) {
+              this.img1 = downloadURL
+              console.log('img1: ' + this.img1)
+            } else if (downloadURL.includes('.mp4')) {
+              this.videoLink = downloadURL
+              console.log('videoLink: ' + this.videoLink)
+            }
           })
         }
       )
