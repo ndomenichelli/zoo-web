@@ -6,16 +6,16 @@
       >
       <div class="nav-bar">
         <button
-          :class="{ invisible: !currentIndex != 0 }"
+          :class="{invisible: !currentIndex != 0}"
           class="nav-button back"
           @click="getPreviousAnimal"
         >
           &lt; Back
         </button>
         <h1>{{ animal.name }}</h1>
-        <h1>{{ currentIndex }}</h1>
+        <!-- <h1>{{ currentIndex }}</h1> -->
         <button
-          :class="{ invisible: (this.currentIndex == (this.animals.length - 1)) }"
+          :class="{invisible: this.currentIndex == this.animals.length - 1}"
           class="nav-button forward"
           @click="getNextAnimal"
         >
@@ -23,6 +23,11 @@
         </button>
       </div>
       <img v-if="animal.image != ''" class="image" :src="animal.image" />
+      <video width="320" height="240" controls muted>
+        <source :src="animal.videoLink" type="video/mp4" />
+        <source :src="animal.image" type="video/ogg" />
+        Your browser does not support the video tag.
+      </video>
       <p>Type of animal: {{ animal.type }}</p>
       <p>This animals was born on: {{ animal.birthdate }}</p>
       <p>{{ animal.description }}</p>
@@ -44,6 +49,7 @@ export default {
       keys: [],
       currentKey: '',
       currentIndex: -1
+      // videoLink: 'https://firebasestorage.googleapis.com/v0/b/petting-zoo-c54f3.appspot.com/o/animals%2Ftest1.mp4?alt=media&token=8d10122c-e26f-4b99-bac1-fb5f275edbb7'
     }
   },
   created () {

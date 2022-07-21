@@ -77,7 +77,8 @@ export default {
       imageLink: '',
       image: '',
       img1: '',
-      imageData: null
+      imageData: null,
+      videoLink: ''
     }
   },
   methods: {
@@ -93,6 +94,8 @@ export default {
 
       const newAnimalsRef = push(animalsRef)
 
+      console.log('videoLink before upload: ' + this.videoLink)
+
       set(newAnimalsRef, {
         id: newAnimalsRef.key,
         name: this.name,
@@ -100,7 +103,8 @@ export default {
         description: this.description,
         birthdate: this.birthdate,
         image: this.img1,
-        dateAdded: Date.now()
+        dateAdded: Date.now(),
+        videoLink: this.videoLink
       })
 
       // console.log('data ' + newAnimalsRef.key)
@@ -126,7 +130,7 @@ export default {
     // manually select picture
     selectedFile () {
       this.imageData = document.querySelector('.dropzoneFile').files[0]
-      // console.log(this.imageData)
+      console.log(this.imageData)
       this.previewImage()
     },
 
@@ -151,17 +155,17 @@ export default {
           // console.log('Upload is ' + progress + '% done')
           switch (snapshot.state) {
             case 'paused':
-              // console.log('Upload is paused')
+              console.log('Upload is paused')
               break
             case 'running':
-              // console.log('Upload is running')
+              console.log('Upload is running')
               break
           }
         },
-        // (error) => {
-        //   // Handle unsuccessful uploads
-        //   // console.log('Unsuccessful Upload: ' + error)
-        // },
+        (error) => {
+          // Handle unsuccessful uploads
+          console.log('Unsuccessful Upload: ' + error)
+        },
         () => {
           // Handle successful uploads on complete
           // For instance, get the download URL: https://firebasestorage.googleapis.com/...
@@ -169,7 +173,8 @@ export default {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             // console.log('File available at', downloadURL)
             this.img1 = downloadURL
-            // console.log(this.img1)
+            this.videoLink = downloadURL
+            console.log('videoLink: ' + this.videoLink)
           })
         }
       )
