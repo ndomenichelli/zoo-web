@@ -131,18 +131,19 @@ export default {
 
       // console.log('data ' + newAnimalsRef.key)
       this.id = newAnimalsRef.key
+
+      this.onUpload()
     },
 
     click1 () {
       this.$refs.input1.click()
     },
 
-    previewImage (event) {
-      // console.log('previewImage')
-      this.uploadValue = 0
-      this.img1 = null
-      this.onUpload()
-    },
+    // previewImage (event) {
+    //   // console.log('previewImage')
+    //   this.uploadValue = 0
+    //   this.img1 = null
+    // },
     // drop picture into dropbox
     drop (event) {
       this.dropData = event.dataTransfer.files[0]
@@ -171,7 +172,7 @@ export default {
           document.querySelector('.dropzoneFile').files[0]
         )
       }
-      this.previewImage()
+      // this.previewImage()
     },
     onUpload () {
       this.img1 = null
@@ -192,7 +193,7 @@ export default {
       const storage = getStorage()
       const storageRef = storRef(
         storage,
-        `animals/${this.name}/${mediaType}/${uploadMedia.name}`
+        `animals/${this.id}/${mediaType}/${uploadMedia.name}`
       )
       const uploadTask = uploadBytesResumable(storageRef, uploadMedia)
       // Register three observers:
