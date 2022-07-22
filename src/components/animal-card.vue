@@ -5,8 +5,8 @@
   >
     <div class="animal-card">
       <!-- <h4>{{ animal.name }}</h4> -->
-      <img v-if="animal.image != ''" class="image" :src="animal.image" />
-      <!-- <div>{{ animal.image }}</div> -->
+      <img v-if="animal.images != ''" class="image" :src="animal.images" />
+      <div>{{ animal.image }}</div>
       <!-- <div>Type of animal: {{ animal.type }}</div> -->
       <!-- <div>{{ animal.description }}</div> -->
       <!-- <div>{{ animal.birthdate }}</div> -->

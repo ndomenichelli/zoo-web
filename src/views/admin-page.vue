@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import { getDatabase, ref as dbRef, push, set } from 'firebase/database'
+import { getDatabase, ref as dbRef, push, set, update } from 'firebase/database'
 import {
   getStorage,
   uploadBytesResumable,
@@ -100,7 +100,9 @@ export default {
       img1: null,
       dropData: null,
       videoLink: null,
-      progress: 0
+      progress: 0,
+      images: [],
+      videos: []
     }
   },
   methods: {
@@ -116,23 +118,43 @@ export default {
 
       const newAnimalsRef = push(animalsRef)
 
-      console.log('videoLink before upload: ' + this.videoLink)
-
       set(newAnimalsRef, {
         id: newAnimalsRef.key,
         name: this.name,
         type: this.type,
         description: this.description,
         birthdate: this.birthdate,
-        image: this.img1,
         dateAdded: Date.now(),
-        videoLink: this.videoLink
+        images: [],
+        videos: []
       })
 
       // console.log('data ' + newAnimalsRef.key)
       this.id = newAnimalsRef.key
 
       this.onUpload()
+
+      console.log('uploadPictureData after upload: ' + this.uploadPictureData)
+      console.log('uploadVideoData after upload: ' + this.uploadVideoData)
+
+      this.images = this.uploadPictureData
+      this.videos = this.uploadVideoData
+
+      // update same key with images and videos
+      const postData = {
+        id: newAnimalsRef.key,
+        name: this.name,
+        type: this.type,
+        description: this.description,
+        birthdate: this.birthdate,
+        images: this.images,
+        videos: this.videos
+      }
+
+      const updates = {}
+      updates['animals/' + this.id] = postData
+
+      update(dbRef(db), updates)
     },
 
     click1 () {
@@ -184,7 +206,10 @@ export default {
       console.log('uploadPicture: ' + uploadMedia.name)
       let mediaType = ''
 
-      if (uploadMedia.name.includes('.jpg') || uploadMedia.name.includes('.png')) {
+      if (
+        uploadMedia.name.includes('.jpg') ||
+        uploadMedia.name.includes('.png')
+      ) {
         mediaType = 'images'
       } else if (uploadMedia.name.includes('.mp4')) {
         mediaType = 'videos'

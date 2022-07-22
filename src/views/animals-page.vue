@@ -1,28 +1,17 @@
 <template>
   <div class="animals">
     <AnimalCard v-for="animal in animals" :key="animal.id" :animal="animal" />
-  </div>
-  <div class="animals">
-    <div v-for="thumbnail in thumbnails" :key="thumbnail.id">
-      <div>thumbnail: {{ thumbnail.toString() }}</div>
-      <!-- <div>thumbnail: {{ thumbnail._location.bucket }}</div> -->
-
+    <!-- <div v-for="image in images" :key="image.id">
       <div>
-        <span class="file-info">File: {{ thumbnail.name }}</span>
+        <span class="file-info">File: {{ image }}</span>
         <div>
-          <img
-            class="preview"
-            height="268"
-            width="356"
-            :src="
-              thumbnail
-            "
-          />
+          <img class="preview" height="268" width="356" :src="image" />
           <br />
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
+  <div>{{ this.images }}</div>
 </template>
 
 <script>
@@ -45,79 +34,86 @@ export default {
   data () {
     return {
       animals: [],
-      thumbnails: [],
+      animalData: [],
+      images: [],
+      videos: [],
       firebaseName: 'https://firebasestorage.googleapis.com/v0/b/'
     }
   },
-  created () {
-    // get all animal information
-    const db = getDatabase()
-    const animalsRef = dbRef(db, 'animals/')
+  async mounted () {
+    await this.getImages()
+    await this.getData()
+  },
+  methods: {
+    async getImages () {
+      // get animal thumbnail
+      const storage = getStorage()
 
-    onValue(animalsRef, (snapshot) => {
-      console.log(snapshot.val())
+      // Create a reference under which you want to list
+      const listRef = storRef(storage, 'animals/')
 
-      const data = snapshot.val()
+      console.log('listRef ' + listRef)
 
-      Object.entries(data).forEach(([animalKey, animalElement]) => {
-        console.log(animalKey)
-        this.animals.push(animalElement)
-      })
+      // Find all the prefixes and items.
+      listAll(listRef)
+        .then((res) => {
+          // animals folder
+          res.prefixes.forEach((folderRef) => {
+            // id folder
+            listAll(folderRef).then((res2) => {
+              // images or video folder
+              res2.prefixes.forEach((folderRef2) => {
+                // image and video files
+                listAll(folderRef2).then((res3) => {
+                  res3.items.forEach((itemRef3) => {
+                    getDownloadURL(storRef(storage, itemRef3)).then((url) => {
+                      // `url` is the download URL for 'images/stars.jpg'
+                      if (url.includes('.jpg') || url.includes('.png')) {
+                        const imagesData = {
+                          images: url
+                        }
+                        this.images.push(imagesData)
+                        this.animals.images = this.images
 
-      console.log(this.animals)
-    })
-
-    // get animal thumbnail
-    const storage = getStorage()
-
-    // Create a reference under which you want to list
-    const listRef = storRef(storage, 'animals/')
-
-    console.log('listRef ' + listRef)
-
-    // Find all the prefixes and items.
-    listAll(listRef)
-      .then((res) => {
-        // animals folder
-        res.prefixes.forEach((folderRef) => {
-          // id folder
-          listAll(folderRef).then((res2) => {
-            // images or video folder
-            res2.prefixes.forEach((folderRef2) => {
-              // image and video files
-              listAll(folderRef2).then((res) => {
-                res.items.forEach((itemRef3) => {
-                  getDownloadURL(storRef(storage, itemRef3)).then((url) => {
-                    // `url` is the download URL for 'images/stars.jpg'
-
-                    if (url.includes('.jpg') || url.includes('.png')) {
-                      this.thumbnails.push(url)
-                    }
+                        console.log(
+                          'animals images ' + JSON.stringify(this.images)
+                        )
+                      }
+                    })
                   })
                 })
-
-                //   res.items.forEach((itemRef3) => {
-                //     console.log('itemRef3: ' + itemRef3.toString)
-                //     const filename = itemRef3.name
-                //     if (filename.includes('.jpg') || filename.includes('.png')) {
-                //       this.thumbnails.push(itemRef3)
-                //     }
-                //   })
               })
             })
-            // res.items.forEach((itemRef) => {
-            //   // All the items under listRef.
-            //   console.log('itemRef' + itemRef)
-            // })
           })
         })
+        .catch((error) => {
+          // Uh-oh, an error occurred!
+          console.log(error)
+        })
+    },
+    async getData () {
+      // get all animal information
+      const db = getDatabase()
+      const animalsRef = dbRef(db, 'animals/')
+
+      onValue(animalsRef, (snapshot) => {
+        // console.log(snapshot.val())
+
+        const data = snapshot.val()
+
+        Object.entries(data).forEach(([animalKey, animalElement]) => {
+          console.log(animalKey)
+          this.animalData.push(animalElement)
+          this.animals.images = this.images
+
+          this.animals = Object.assign(this.animalData, this.images)
+          // console.log('images 2 ' + JSON.stringify(this.images))
+        })
+
+        console.log('full animal object ' + JSON.stringify(this.animals))
       })
-      .catch((error) => {
-        // Uh-oh, an error occurred!
-        console.log(error)
-      })
-  },
-  mounted () {}
+    }
+  }
 }
 </script>
 

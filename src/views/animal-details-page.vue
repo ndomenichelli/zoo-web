@@ -23,10 +23,14 @@
         </button>
       </div>
       <p>{{ animal.videoLink }}</p>
-      <img v-if="animal.image != null" class="image" :src="animal.image" />
+      <div v-for="image in animal.images" :key="image.id">
+        <div>image</div>
+        <img v-if="image != ''" class="image" :src="image" />
+      </div>
+      <!-- <img v-if="animal.image != null" class="image" :src="animal.image" /> -->
       <video
         v-if="animal.videoLink != null"
-        id = "video"
+        id="video"
         width="400"
         height="400"
         controls
