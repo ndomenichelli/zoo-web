@@ -181,11 +181,18 @@ export default {
     },
     upload (uploadMedia) {
       console.log('uploadPicture: ' + uploadMedia.name)
+      let mediaType = ''
+
+      if (uploadMedia.name.includes('.jpg') || uploadMedia.name.includes('.png')) {
+        mediaType = 'images'
+      } else if (uploadMedia.name.includes('.mp4')) {
+        mediaType = 'videos'
+      }
 
       const storage = getStorage()
       const storageRef = storRef(
         storage,
-        `animals/${this.name}/${uploadMedia.name}`
+        `animals/${this.name}/${mediaType}/${uploadMedia.name}`
       )
       const uploadTask = uploadBytesResumable(storageRef, uploadMedia)
       // Register three observers:
